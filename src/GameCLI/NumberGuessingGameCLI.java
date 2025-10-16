@@ -10,15 +10,15 @@ public class NumberGuessingGameCLI {
 	private static int stage = 1;
 	private static int chances;
 	private static int max = 3;
+	private static long startClock;
 	
 	public static void main (String args []) {
 		Scanner scanner = new Scanner(System.in); 
 		printWelcomeText();
 		printSelectDifficulty();
-		System.out.println("Enter your choice:");
 	    
 	    while (scanner.hasNextLine()){
-		    String inputString = scanner.nextLine(); 
+		    String inputString = scanner.nextLine().trim(); 
 		    if (inputString.equals("quit")) {
 		    	break;
 		    } else {
@@ -26,6 +26,7 @@ public class NumberGuessingGameCLI {
 		    		chances = numChancesByDifficulty(inputString);
 		    		stage = 2;
 		    		max = 100;
+		    		startClock = System.currentTimeMillis();
 		    		System.out.println("\nGreat! You have selected the " + printDifficulty(inputString) + " difficulty level [" + chances + " chances].");
 		    		System.out.println("\nLet's start the game!");
 		    		System.out.println("\nEnter your guess (or type quit):");
@@ -38,6 +39,9 @@ public class NumberGuessingGameCLI {
 			    		} else {
 			    			System.out.println("Congratulations! You guessed the correct number in " + attemptsCount + " attempts.");
 			    		}
+			    		long elapsedTimeMillis = System.currentTimeMillis()-startClock;
+			    		float elapsedTimeSec = elapsedTimeMillis/1000F;
+			    		System.out.println("It took you " + elapsedTimeSec + " seconds.");
 			    		stage = 3;
 			    		System.out.println("Do you want to play again? (Y/N)");
 			    	} else if (userNumber < secretNumber) {
@@ -57,7 +61,6 @@ public class NumberGuessingGameCLI {
 		    			restartGame();
 		    			printWelcomeText();
 		    			printSelectDifficulty();
-		    			System.out.println("Enter your choice:");
 		    		} else if (inputString.trim().toUpperCase().equals("N")) {
 		    			break;
 		    		} else {
@@ -112,6 +115,7 @@ public class NumberGuessingGameCLI {
 				+ "1. Easy (10 chances)\n"
 				+ "2. Medium (5 chances)\n"
 				+ "3. Hard (3 chances)");
+		System.out.println("\nEnter your choice:");
 	}
 	
 	private static String printDifficulty (String inputString) {
