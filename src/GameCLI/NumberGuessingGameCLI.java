@@ -11,6 +11,7 @@ public class NumberGuessingGameCLI {
 	private static int chances;
 	private static int max = 3;
 	private static long startClock;
+	private static int highscore;
 	
 	public static void main (String args []) {
 		Scanner scanner = new Scanner(System.in); 
@@ -42,6 +43,7 @@ public class NumberGuessingGameCLI {
 			    		long elapsedTimeMillis = System.currentTimeMillis()-startClock;
 			    		float elapsedTimeSec = elapsedTimeMillis/1000F;
 			    		System.out.println("It took you " + elapsedTimeSec + " seconds.");
+			    		checkHighscore(attemptsCount);
 			    		stage = 3;
 			    		System.out.println("Do you want to play again? (Y/N)");
 			    	} else if (userNumber < secretNumber) {
@@ -97,6 +99,22 @@ public class NumberGuessingGameCLI {
 			numChances = 3;
 		}
 		return numChances;
+	}
+	
+	private static void checkHighscore (int numAttempts) {
+		boolean isANewHighscore = false;
+		if (highscore > 0) {
+			if (numAttempts < highscore) {
+				isANewHighscore = true;
+			}
+		} else {
+			isANewHighscore = true;
+		}
+		
+		if (isANewHighscore) {
+			highscore = numAttempts;
+			System.out.println("Awesome! You setted a new Highscore: " + numAttempts + " attempts.");
+		}
 	}
 	
 	private static void printEnterValidNumber(int max) {
