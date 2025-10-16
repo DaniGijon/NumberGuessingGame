@@ -8,17 +8,28 @@ public class NumberGuessingGameCLI {
 	private static int userNumber;
 	private static int attemptsCount = 0;
 	private static int stage = 1;
+	private static int chances;
+	private static int max = 3;
 	
 	public static void main (String args []) {
 		Scanner scanner = new Scanner(System.in); 
 		printWelcomeText();
-	    System.out.println("\nEnter your guess (or type quit):");
+		printSelectDifficulty();
+		System.out.println("Enter your choice:");
+	    
 	    while (scanner.hasNextLine()){
 		    String inputString = scanner.nextLine(); 
 		    if (inputString.equals("quit")) {
 		    	break;
 		    } else {
-		    	if (stage == 1 && isAValidNumber(inputString)) {
+		    	if (stage == 1 && isAValidNumber(inputString, max)) {
+		    		chances = numChancesByDifficulty(inputString);
+		    		stage = 2;
+		    		max = 100;
+		    		System.out.println("\nGreat! You have selected the " + printDifficulty(inputString) + " difficulty level [" + chances + " chances].");
+		    		System.out.println("\nLet's start the game!");
+		    		System.out.println("\nEnter your guess (or type quit):");
+		    	} else if (stage == 2 && chances > 0 && isAValidNumber(inputString, max)) {
 			    	userNumber = Integer.valueOf(inputString);
 			    	++attemptsCount;
 			    	if (userNumber == secretNumber) {
@@ -27,19 +38,26 @@ public class NumberGuessingGameCLI {
 			    		} else {
 			    			System.out.println("Congratulations! You guessed the correct number in " + attemptsCount + " attempts.");
 			    		}
-			    		stage = 2;
+			    		stage = 3;
 			    		System.out.println("Do you want to play again? (Y/N)");
 			    	} else if (userNumber < secretNumber) {
 			    		System.out.println("Incorrect. The number is greater than " + userNumber);
+			    		chances --;
 			    	} else {
 			    		System.out.println("Incorrect. The number is less than " + userNumber);	
+			    		chances --;
 			    	}
-					//System.out.println("Secret Number is: " + secretNumber);
-		    	} else if (stage == 2) {
+			    	if (chances == 0) {
+			    		System.out.println("You lost. Secret Number was: " + secretNumber);
+			    		stage = 3;
+			    		System.out.println("Do you want to play again? (Y/N)");
+			    	}
+		    	} else if (stage == 3) {
 		    		if (inputString.trim().toUpperCase().equals("Y")) {
 		    			restartGame();
 		    			printWelcomeText();
-		    		    System.out.println("\nEnter your guess (or type quit):");
+		    			printSelectDifficulty();
+		    			System.out.println("Enter your choice:");
 		    		} else if (inputString.trim().toUpperCase().equals("N")) {
 		    			break;
 		    		} else {
@@ -47,15 +65,15 @@ public class NumberGuessingGameCLI {
 		    		}
 		    	
 		    	} else {
-		    		System.out.println("You must enter a number between 1 and 100, with no decimals.");
+		    		printEnterValidNumber(max);
 		    	}
 		    }
 	    }
 	}
 	
-	private static boolean isAValidNumber (String numberStr) {
+	private static boolean isAValidNumber (String numberStr, int max) {
 		try {
-			return Integer.parseInt(numberStr) > 0 &&  Integer.parseInt(numberStr) <= 100 ? true : false;
+			return Integer.parseInt(numberStr) > 0 &&  Integer.parseInt(numberStr) <= max ? true : false;
 		} catch (NumberFormatException nfe)  {
 			return false;
 		}
@@ -64,13 +82,47 @@ public class NumberGuessingGameCLI {
 	private static void restartGame () {
 		attemptsCount = 0;
 		stage = 1;
+		max = 3;
 		secretNumber = (int) (Math.random() * 100 + 1);
+	}
+	
+	private static int numChancesByDifficulty (String inputString) {
+		int numChances = 10;
+		if (inputString.equals("2")) {
+			numChances = 5;
+		} else if (inputString.equals("3")) {
+			numChances = 3;
+		}
+		return numChances;
+	}
+	
+	private static void printEnterValidNumber(int max) {
+		System.out.println("You must enter a number between 1 and " + max + ", with no decimals.");
 	}
 	
 	private static void printWelcomeText () {
 		System.out.println("Welcome to the Number Guessing Game!\n"
 				+ "I'm thinking of a number between 1 and 100.\n"
-				+ "You have 5 chances to guess the correct number.");
-		System.out.println("\nLet's start the game!");
+				+ "You have a few chances to guess the correct number.");
+	}
+	
+	private static void printSelectDifficulty () {
+		System.out.println("\n"
+				+ "Please select the difficulty level:\n"
+				+ "1. Easy (10 chances)\n"
+				+ "2. Medium (5 chances)\n"
+				+ "3. Hard (3 chances)");
+	}
+	
+	private static String printDifficulty (String inputString) {
+		switch (inputString) {
+			case "1": 
+				return "Easy";
+			case "2":
+				return "Medium";
+			case "3":
+				return "Hard";
+		}
+		return inputString;
 	}
 }
